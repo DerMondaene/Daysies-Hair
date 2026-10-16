@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Daysies Hair – Cameroonian Salon</title>
+    <title>Daysies Hair – Cameroonian Salon & Cultural Braiding Patterns (500 Unique Master Patterns)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -52,7 +52,6 @@
             display: block;
         }
 
-        /* Smooth pulse animation for active tool */
         @keyframes toolPulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -64,15 +63,13 @@
             box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
         }
 
-        /* Glassmorphism overlays */
         .glass-panel {
-            background: rgba(30, 15, 8, 0.88);
+            background: rgba(30, 15, 8, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
-        /* Custom scrollbar for sidebar */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -80,24 +77,32 @@
 <body>
 
 <div id="app">
-    <!-- Header HUD -->
-    <header class="h-14 bg-amber-950/80 border-b border-amber-700/50 px-4 flex justify-between items-center z-10 shrink-0">
+    <header class="h-14 bg-amber-950/90 border-b border-amber-700/50 px-3 flex justify-between items-center z-10 shrink-0">
         <div class="flex items-center gap-2">
             <span class="text-xl">💈</span>
-            <h1 class="font-bold text-amber-400 text-base sm:text-lg tracking-wide">Daysies Hair</h1>
+            <div>
+                <h1 class="font-bold text-amber-400 text-sm sm:text-base tracking-wide leading-none">Daysies Hair</h1>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                    <span id="hud-day" class="text-[10px] text-amber-200 font-bold tracking-wider uppercase">Day 1</span>
+                    <span class="text-[10px] text-amber-500">•</span>
+                    <span id="hud-timer" class="text-[10px] text-amber-300 font-mono">02:00</span>
+                </div>
+            </div>
         </div>
         
-        <div class="flex items-center gap-3">
-            <div class="bg-amber-900/90 border border-amber-500/50 px-3 py-1 rounded-full text-xs font-bold text-amber-200 tracking-wider" id="hud-score">
-                0 FCFA
+        <div class="flex items-center gap-2">
+            <button onclick="openBankModal()" class="bg-amber-900/90 border border-amber-500/50 px-2 py-1 rounded-lg text-xs font-bold text-amber-200 flex items-center gap-1 active:scale-95" aria-label="Bank">
+                <span>🏦</span> <span id="hud-bank">0</span>
+            </button>
+            <div class="bg-amber-900/90 border border-amber-500/50 px-2.5 py-1 rounded-lg text-xs font-bold text-green-300 tracking-wider" id="hud-score">
+                25,000 FCFA
             </div>
-            <button onclick="togglePause()" class="w-8 h-8 rounded-full bg-amber-800 border border-amber-400/60 flex items-center justify-center text-amber-200 active:scale-95 transition-transform" aria-label="Pause">
+            <button onclick="togglePause()" class="w-7 h-7 rounded-full bg-amber-800 border border-amber-400/60 flex items-center justify-center text-amber-200 active:scale-95" aria-label="Pause">
                 ⏸️
             </button>
         </div>
     </header>
 
-    <!-- Main Game Workspace -->
     <main class="flex-1 flex relative overflow-hidden">
         <!-- Customer Queue Sidebar -->
         <aside class="w-20 sm:w-24 bg-black/40 border-r border-amber-800/40 p-2 flex flex-col items-center gap-3 shrink-0 z-10">
@@ -122,7 +127,6 @@
         </section>
     </main>
 
-    <!-- Bottom Tool Tray -->
     <footer class="h-20 bg-amber-950/90 border-t border-amber-800/60 p-2 px-3 grid grid-cols-4 gap-2 z-10 shrink-0">
         <button id="btn-comb" onclick="selectTool('comb')" class="tool-btn bg-amber-900/40 border border-amber-700/50 rounded-xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-xl">📏</span>
@@ -142,73 +146,97 @@
         </button>
     </footer>
 
-    <!-- Main Menu Overlay -->
     <div id="mainMenu" class="absolute inset-0 z-30 glass-panel flex flex-col justify-center items-center p-6 text-center">
         <div class="text-5xl mb-2">💈</div>
         <h1 class="text-3xl font-extrabold text-amber-400 tracking-tight mb-1">Daysies Hair</h1>
-        <p class="text-xs text-amber-200/80 mb-6 max-w-xs">Cameroonian Salon • Infinite Procedural African Braiding</p>
+        <p class="text-xs text-amber-200/80 mb-6 max-w-xs">Cameroonian Salon • Baby Khadid & 500 Unique Cultural Braiding Patterns</p>
 
         <div class="w-full max-w-xs space-y-4 mb-6 text-left">
             <div>
-                <label id="lbl-lang" class="block text-xs font-semibold text-amber-300 mb-1">Language / Sprache / Langue</label>
-                <select id="select-lang" onchange="changeLanguage(this.value)" class="w-full bg-amber-950 border border-amber-500/50 rounded-lg p-2.5 text-sm text-amber-100 font-medium focus:outline-none focus:border-amber-400">
-                    <option value="de">Deutsch</option>
-                    <option value="en" selected>English</option>
+                <label id="lbl-lang" class="block text-xs font-semibold text-amber-300 mb-1">Language</label>
+                <select id="select-lang" onchange="changeLanguage(this.value)" class="w-full bg-amber-950 border border-amber-500/50 rounded-lg p-2.5 text-sm text-amber-100 font-medium">
+                    <option value="de" selected>Deutsch</option>
+                    <option value="en">English</option>
                     <option value="fr">Français</option>
                 </select>
             </div>
-
             <div>
-                <label id="lbl-diff" class="block text-xs font-semibold text-amber-300 mb-1">Difficulty / Schwierigkeit</label>
-                <select id="select-diff" class="w-full bg-amber-950 border border-amber-500/50 rounded-lg p-2.5 text-sm text-amber-100 font-medium focus:outline-none focus:border-amber-400">
-                    <option value="easy">Easy / Facile / Leicht</option>
-                    <option value="medium" selected>Medium / Moyen / Normal</option>
-                    <option value="hard">Master / Expert / Meister</option>
+                <label id="lbl-diff" class="block text-xs font-semibold text-amber-300 mb-1">Difficulty</label>
+                <select id="select-diff" onchange="changeDifficulty(this.value)" class="w-full bg-amber-950 border border-amber-500/50 rounded-lg p-2.5 text-sm text-amber-100 font-medium">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Master</option>
                 </select>
             </div>
         </div>
 
-        <button id="btn-start" onclick="startGame()" class="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-amber-950 font-bold py-3.5 px-6 rounded-xl shadow-lg active:scale-98 transition-transform text-base">
+        <button id="btn-start" onclick="startGame()" class="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-amber-950 font-bold py-3.5 px-6 rounded-xl shadow-lg active:scale-98 text-base">
             Start Game ➔
         </button>
     </div>
 
-    <!-- Pause Overlay -->
     <div id="pauseOverlay" class="absolute inset-0 z-30 glass-panel hidden flex-col justify-center items-center p-6 text-center">
         <h2 id="txt-paused" class="text-2xl font-bold text-amber-400 mb-6">Game Paused</h2>
         <div class="w-full max-w-xs space-y-3">
-            <button id="btn-resume" onclick="togglePause()" class="w-full bg-amber-500 text-amber-950 font-bold py-3 px-4 rounded-xl shadow active:scale-98">
-                Resume ➔
-            </button>
-            <button id="btn-restart" onclick="restartGame()" class="w-full bg-amber-900 border border-amber-600 text-amber-100 font-semibold py-3 px-4 rounded-xl active:scale-98">
-                Restart 🔄
-            </button>
-            <button id="btn-exit" onclick="exitToMenu()" class="w-full bg-amber-950 border border-amber-800 text-amber-300/80 font-semibold py-3 px-4 rounded-xl active:scale-98">
-                Main Menu 🏠
-            </button>
+            <button id="btn-resume" onclick="togglePause()" class="w-full bg-amber-500 text-amber-950 font-bold py-3 px-4 rounded-xl shadow">Resume ➔</button>
+            <button id="btn-restart" onclick="restartGame()" class="w-full bg-amber-900 border border-amber-600 text-amber-100 font-semibold py-3 px-4 rounded-xl">Restart 🔄</button>
+            <button id="btn-exit" onclick="exitToMenu()" class="w-full bg-amber-950 border border-amber-800 text-amber-300 font-semibold py-3 px-4 rounded-xl">Main Menu 🏠</button>
         </div>
     </div>
 
-    <!-- Celebration / Performance Rating Overlay -->
     <div id="celebrationOverlay" class="absolute inset-0 z-30 glass-panel hidden flex-col justify-center items-center p-6 text-center">
         <div class="text-4xl mb-2">✨</div>
         <h2 id="txt-celeb-title" class="text-2xl font-black text-amber-400 mb-1">HAIRSTYLE COMPLETE!</h2>
-        <div id="celeb-stars" class="text-4xl my-3 tracking-widest filter drop-shadow">⭐⭐⭐</div>
-        <p id="celeb-text" class="text-xs text-amber-200/90 mb-4 font-medium">Time: 12s • Precision: High</p>
+        <div id="celeb-stars" class="text-4xl my-3 tracking-widest">⭐⭐⭐</div>
+        <p id="celeb-text" class="text-xs text-amber-200/90 mb-4 font-medium">Precision: High</p>
         
         <div class="bg-amber-900/60 border border-amber-500/40 rounded-xl p-3 px-6 mb-6">
             <span id="lbl-earnings" class="text-xs text-amber-300 block mb-0.5">Earnings:</span>
             <span id="celeb-money" class="text-xl font-extrabold text-green-400">+1,500 FCFA</span>
         </div>
 
-        <button id="btn-next-cust" onclick="nextCustomer()" class="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-amber-950 font-bold py-3.5 px-6 rounded-xl shadow-lg active:scale-98 transition-transform text-base">
+        <button id="btn-next-cust" onclick="triggerNextCustomer()" class="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-amber-950 font-bold py-3.5 px-6 rounded-xl shadow-lg active:scale-98 text-base">
             Next Customer ➔
         </button>
+    </div>
+
+    <div id="daySummaryOverlay" class="absolute inset-0 z-40 glass-panel hidden flex-col justify-center items-center p-6 text-center">
+        <div class="text-4xl mb-2">🏠</div>
+        <h2 id="summary-title" class="text-2xl font-black text-amber-400 mb-2">DAILY SUMMARY & RENT</h2>
+        <div id="summary-content" class="w-full max-w-xs bg-amber-950/80 border border-amber-600/40 rounded-xl p-4 text-left text-xs space-y-2 mb-6 text-amber-200"></div>
+        <button onclick="closeDaySummary()" class="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-amber-950 font-bold py-3.5 px-6 rounded-xl shadow-lg active:scale-98 text-base">
+            Next Day ➔
+        </button>
+    </div>
+
+    <div id="bankOverlay" class="absolute inset-0 z-40 glass-panel hidden flex-col justify-center items-center p-6 text-center">
+        <div class="text-4xl mb-2">🏦</div>
+        <h2 class="text-2xl font-black text-amber-400 mb-1">Bamenda Central Bank</h2>
+        <p class="text-xs text-amber-200/80 mb-4">Manage your finances & loans</p>
+        
+        <div class="w-full max-w-xs bg-amber-950/80 border border-amber-600/40 rounded-xl p-4 text-left text-xs space-y-3 mb-6 text-amber-200">
+            <div class="flex justify-between"><span>Balance:</span> <span id="bank-cash" class="font-bold text-green-400">0 FCFA</span></div>
+            <div class="flex justify-between"><span>Current Debt:</span> <span id="bank-debt" class="font-bold text-red-400">0 FCFA</span></div>
+            <div class="pt-2 border-t border-amber-800/60 flex gap-2">
+                <button onclick="takeLoan(10000)" class="flex-1 bg-amber-800 hover:bg-amber-700 py-2 rounded-lg font-bold">Take Loan (+10k)</button>
+                <button onclick="repayLoan(10000)" class="flex-1 bg-green-800 hover:bg-green-700 py-2 rounded-lg font-bold">Repay (-10k)</button>
+            </div>
+        </div>
+
+        <button onclick="closeBankModal()" class="w-full max-w-xs bg-amber-700 text-amber-100 font-bold py-3 rounded-xl shadow active:scale-98 text-base">
+            Close ✕
+        </button>
+    </div>
+
+    <div id="liveEventOverlay" class="absolute inset-0 z-40 glass-panel hidden flex-col justify-center items-center p-6 text-center">
+        <div id="live-event-icon" class="text-5xl mb-3 animate-pulse">⚡</div>
+        <h2 id="live-event-title" class="text-xl font-extrabold text-amber-300 mb-2">Salon Dilemma!</h2>
+        <p id="live-event-desc" class="text-xs text-amber-100/90 mb-5 max-w-xs leading-relaxed font-medium">Event description...</p>
+        <div id="live-event-choices" class="w-full max-w-xs space-y-2.5"></div>
     </div>
 </div>
 
 <script>
-    // Audio Context Setup
     let audioCtx = null;
     function initAudio() {
         if (!audioCtx) {
@@ -261,46 +289,211 @@
         } catch(e){}
     }
 
-    // Localization Data
     const i18n = {
         de: {
             queue: "Warteschlange", req: "Benötigt:", comb: "Kamm", needle: "Nadel", oil: "Edge Öl", beads: "Perlen",
             lang: "Sprache", diff: "Schwierigkeit", start: "Spiel Starten ➔", paused: "Spiel Pausiert",
             resume: "Weiterspielen ➔", restart: "Neustart 🔄", exit: "Hauptmenü 🏠", nextCust: "Nächste Kundin ➔",
-            celebTitle: "FRISUR FERTIG!", earnings: "Verdienst:",
+            celebTitle: "FRISUR FERTIG!", earnings: "Verdienst:", dayLabel: "Tag",
             tools: { comb: "Abteilkamm", needle: "Flechtnadel", oil: "Glanzöl & Gel", beads: "Perlen & Muscheln" }
         },
         en: {
             queue: "Queue", req: "Required:", comb: "Comb", needle: "Needle", oil: "Edge Oil", beads: "Beads",
             lang: "Language", diff: "Difficulty", start: "Start Game ➔", paused: "Game Paused",
             resume: "Resume ➔", restart: "Restart 🔄", exit: "Main Menu 🏠", nextCust: "Next Customer ➔",
-            celebTitle: "HAIRSTYLE COMPLETE!", earnings: "Earnings:",
+            celebTitle: "HAIRSTYLE COMPLETE!", earnings: "Earnings:", dayLabel: "Day",
             tools: { comb: "Parting Comb", needle: "Braiding Needle", oil: "Edge Oil & Gel", beads: "Beads & Shells" }
         },
         fr: {
             queue: "Attente", req: "Requis:", comb: "Peigne", needle: "Aiguille", oil: "Huile", beads: "Perles",
             lang: "Langue", diff: "Difficulté", start: "Commencer ➔", paused: "Jeu en Pause",
             resume: "Continuer ➔", restart: "Recommencer 🔄", exit: "Menu Principal 🏠", nextCust: "Client Suivant ➔",
-            celebTitle: "COIFFURE TERMINÉE!", earnings: "Gains:",
+            celebTitle: "COIFFURE TERMINÉE!", earnings: "Gains:", dayLabel: "Jour",
             tools: { comb: "Peigne à Séparer", needle: "Aiguille à Tresser", oil: "Huile Brillance", beads: "Perles & Coquillages" }
         }
     };
 
-    let lang = "en";
-    let score = 0;
+    let lang = "de";
+    let difficulty = "medium";
+    let score = 25000;
+    let bankDebt = 0;
     let customerIndex = 0;
     let completedLinesCount = 0;
     let isDrawing = false;
     let isPaused = false;
     let tracePoints = [];
     let currentHairstyle = null;
-    let startTime = 0;
-    let totalAccuracyErrors = 0;
-    let totalSamples = 0;
+    let activeMultiplier = 1.0;
     let currentTool = 'needle';
+    
+    let currentDay = 1;
+    let dayTimeLeft = 120;
+    let dayTimerInterval = null;
 
-    const toolKeys = ['needle', 'comb', 'oil', 'beads'];
-    const styleNames = ['Fulani Royal', 'Bantu Diamond', 'Douala Wave', 'Yaoundé Grid', 'Kribi Crown', 'Goddess Sweep', 'Tribal Lattice', 'Lemonade Twist'];
+    const masterEvents = [];
+    const toolKeys = ['comb', 'needle', 'oil', 'beads'];
+
+    for (let i = 1; i <= 125; i++) {
+        masterEvents.push({
+            id: i, cat: 'khadid', icon: '👶',
+            title: `Baby Khadid Event #${i}: Mütterliche Fürsorge & Arbeit`,
+            desc: `Khadid benötigt während der arbeitsintensiven Stunden im Salon sofortige Aufmerksamkeit. Wie reagierst du?`,
+            c1: "Persönlich kümmern (-15% Zeit, +Mutterbindung & Wohlbefinden)",
+            c1Act: () => { activeMultiplier *= 0.85; showToast("Khadid beruhigt. Starke Mutterbindung!"); },
+            c2: "Lehrling einspringen lassen (-500 FCFA, stabiler Workflow)",
+            c2Act: () => { score -= 500; updateScoreDisplay(); showToast("Workflow gewahrt, kleiner finanzieller Abzug."); }
+        });
+    }
+
+    for (let i = 126; i <= 250; i++) {
+        masterEvents.push({
+            id: i, cat: 'romance', icon: '💖',
+            title: `Romantik #${i}: Herzensangelegenheiten & Intrigen`,
+            desc: `Eine unerwartete Nachricht oder Begegnung stellt dein Liebesleben auf die Probe während du im Salon arbeitest.`,
+            c1: "Aufmerksam sein & antworten (-10% Ausdauer, +Romantik)",
+            c1Act: () => { activeMultiplier *= 0.9; showToast("Romantische Beziehung vertieft."); },
+            c2: "Komplett ignorieren für den Salon (+Voller Fokus & Business-Ruf)",
+            c2Act: () => { activeMultiplier *= 1.1; showToast("Voller Fokus auf die Salonarbeit!"); }
+        });
+    }
+
+    for (let i = 251; i <= 375; i++) {
+        masterEvents.push({
+            id: i, cat: 'salon', icon: '⚡',
+            title: `Salon-Management #${i}: Betrieb & Finanzen`,
+            desc: `Eine technische Hürde oder ein geschäftlicher Zwischenfall erfordert schnelles Handeln im Laden.`,
+            c1: "Sofort professionell lösen (-2.000 FCFA, reibungsloser Betrieb)",
+            c1Act: () => { score -= 2000; updateScoreDisplay(); showToast("Problem sofort professionell gelöst."); },
+            c2: "Provisorisch selbst flicken (-20% Geschwindigkeit, Geld gespart)",
+            c2Act: () => { activeMultiplier *= 0.8; showToast("Provisorium im Einsatz. Etwas langsamer."); }
+        });
+    }
+
+    for (let i = 376; i <= 500; i++) {
+        masterEvents.push({
+            id: i, cat: 'neighbors', icon: '🛒',
+            title: `Nachbarschaft #${i}: Quartier-Dynamik`,
+            desc: `Ein Ereignis vor der Ladentür im Quartier betrifft deine Kundschaft und den Nachbarschaftsfrieden.`,
+            c1: "Großzügig beilegen mit Spende (-1.000 FCFA, +Community-Respekt)",
+            c1Act: () => { score -= 1000; updateScoreDisplay(); showToast("Quartiersfrieden gestärkt."); },
+            c2: "Neutral bleiben & Distanz wahren (Neutral, Geld gespart)",
+            c2Act: () => { showToast("Neutralen Standpunkt bewahrt."); }
+        });
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    let eventQueueIndex = 0;
+    let customersUntilNextEvent = 2;
+
+    function getNextCategorizedEvent() {
+        if (eventQueueIndex >= masterEvents.length) {
+            eventQueueIndex = 0;
+            shuffleArray(masterEvents);
+        }
+        return masterEvents[eventQueueIndex++];
+    }
+
+    const stylePrefixes = ["Kribi", "Douala", "Yaoundé", "Bamenda", "Bafoussam", "Garoua", "Buea", "Maroua", "Ebolowa", "Limbe"];
+    const styleSuffixes = ["Crown", "Swirl", "Box Braid", "Fulani Twist", "Cornrow", "Cascade", "Lattice", "Goddess", "Royal", "Diamond", "Bantu"];
+
+    const difficultySettings = {
+        easy: { tolerance: 38, minLines: 3, maxLines: 4 },
+        medium: { tolerance: 28, minLines: 4, maxLines: 6 },
+        hard: { tolerance: 18, minLines: 6, maxLines: 9 }
+    };
+
+    const TOTAL_HAIRSTYLE_PATTERNS = 500;
+    let masterHairstyleSequence = [];
+
+    function generateSafeHairstyleMasterList() {
+        masterHairstyleSequence = [];
+        for (let i = 0; i < TOTAL_HAIRSTYLE_PATTERNS; i++) {
+            const prefix = stylePrefixes[i % stylePrefixes.length];
+            const suffix = styleSuffixes[Math.floor(i / stylePrefixes.length) % styleSuffixes.length];
+            const requiredTool = toolKeys[i % toolKeys.length];
+            
+            const lineCount = 4 + (i % 5); // 4 to 8 lines
+            const lines = [];
+            const layoutType = i % 4; // 0: Curved Cornrows, 1: Radial Crown, 2: Zigzag Partition, 3: Side Swept Waves
+
+            if (layoutType === 0) {
+                // Parallel curved cornrows flowing back
+                for (let l = 0; l < lineCount; l++) {
+                    const startX = 70 + (l * (160 / (lineCount - 1 || 1)));
+                    const curveOffset = ((l % 2 === 0) ? 1 : -1) * (15 + (i % 15));
+                    lines.push({
+                        pts: [
+                            { x: startX, y: 70 },
+                            { x: startX + curveOffset, y: 170 },
+                            { x: startX, y: 260 }
+                        ],
+                        done: false
+                    });
+                }
+            } else if (layoutType === 1) {
+                // Radial crown pattern from center apex
+                const cx = 150;
+                const cy = 150;
+                const radius = 65 + (i % 25);
+                for (let l = 0; l < lineCount; l++) {
+                    const angle = (l / lineCount) * Math.PI * 2 + (i * 0.1);
+                    lines.push({
+                        pts: [
+                            { x: cx, y: cy },
+                            { x: cx + Math.cos(angle) * radius, y: cy + Math.sin(angle) * radius }
+                        ],
+                        done: false
+                    });
+                }
+            } else if (layoutType === 2) {
+                // Geometric zigzag parting
+                for (let l = 0; l < lineCount; l++) {
+                    const startY = 70 + (l * (180 / (lineCount - 1 || 1)));
+                    lines.push({
+                        pts: [
+                            { x: 70, y: startY },
+                            { x: 150, y: startY + ((l % 2 === 0) ? 20 : -20) },
+                            { x: 230, y: startY }
+                        ],
+                        done: false
+                    });
+                }
+            } else {
+                // Side swept asymmetrical waves
+                for (let l = 0; l < lineCount; l++) {
+                    const startY = 60 + (l * (200 / (lineCount - 1 || 1)));
+                    const shift = 30 + ((i + l) % 40);
+                    lines.push({
+                        pts: [
+                            { x: 80, y: startY },
+                            { x: 150 + shift, y: startY + 25 },
+                            { x: 220, y: startY + 50 }
+                        ],
+                        done: false
+                    });
+                }
+            }
+
+            masterHairstyleSequence.push({
+                name: `${prefix} ${suffix} #${i + 1}`,
+                tool: requiredTool,
+                lines: lines
+            });
+        }
+    }
+
+    generateSafeHairstyleMasterList();
+    shuffleArray(masterHairstyleSequence);
+
+    function changeDifficulty(diff) {
+        difficulty = diff;
+    }
 
     function changeLanguage(newLang) {
         lang = newLang;
@@ -321,10 +514,20 @@
         document.getElementById('btn-next-cust').innerText = t.nextCust;
         document.getElementById('txt-celeb-title').innerText = t.celebTitle;
         document.getElementById('lbl-earnings').innerText = t.earnings;
+        updateHUDDay();
         updateToolBanner();
     }
 
-    // Canvas & Responsive Viewport Handling
+    function updateHUDDay() {
+        const t = i18n[lang];
+        document.getElementById('hud-day').innerText = `${t.dayLabel} ${currentDay}`;
+    }
+
+    function updateScoreDisplay() {
+        document.getElementById('hud-score').innerText = `${score.toLocaleString()} FCFA`;
+        document.getElementById('hud-bank').innerText = `${bankDebt.toLocaleString()} Debt`;
+    }
+
     const canvas = document.getElementById('hairCanvas');
     const ctx = canvas.getContext('2d');
     const canvasWrapper = document.getElementById('canvas-wrapper');
@@ -335,7 +538,7 @@
         const size = Math.min(rect.width - 10, rect.height - 10, 420);
         
         canvas.width = size * dpr;
-        canvas.height = (size * 1.15) * dpr; // 1:1.15 aspect ratio suited for rear head view
+        canvas.height = (size * 1.15) * dpr;
         canvas.style.width = `${size}px`;
         canvas.style.height = `${size * 1.15}px`;
         
@@ -344,84 +547,6 @@
     }
 
     window.addEventListener('resize', resizeCanvas);
-
-    // Procedural Braid Pattern Generator
-    function generateProceduralPattern(seed) {
-        const pseudoRand = (offset) => {
-            let x = Math.sin(seed * 99.123 + offset * 37.712) * 43758.5453;
-            return x - Math.floor(x);
-        };
-
-        const tool = toolKeys[Math.floor(pseudoRand(1) * toolKeys.length)];
-        const name = `${styleNames[Math.floor(pseudoRand(2) * styleNames.length)]} #${seed + 1}`;
-        const patternType = Math.floor(pseudoRand(3) * 6);
-        const lineCount = 3 + Math.floor(pseudoRand(4) * 3); // 3 to 5 lines for optimal touch area
-        const lines = [];
-
-        // Virtual coordinates space normalized to 300 x 345
-        if (patternType === 0) {
-            // S-Curves / Waves
-            const amp = 25 + pseudoRand(5) * 20;
-            for (let i = 0; i < lineCount; i++) {
-                const startX = 70 + i * (160 / (lineCount - 1));
-                lines.push({
-                    pts: [
-                        {x: startX, y: 70},
-                        {x: startX + (i % 2 === 0 ? amp : -amp), y: 160},
-                        {x: startX, y: 250}
-                    ],
-                    done: false
-                });
-            }
-        } else if (patternType === 1) {
-            // Radial Sunburst Crown
-            const centerX = 150;
-            const centerY = 150;
-            const radius = 90;
-            for (let i = 0; i < lineCount + 1; i++) {
-                const angle = (Math.PI * 0.8 / lineCount) * i + Math.PI * 1.1;
-                lines.push({
-                    pts: [
-                        {x: centerX, y: centerY},
-                        {x: centerX + Math.cos(angle) * radius, y: centerY + Math.sin(angle) * radius}
-                    ],
-                    done: false
-                });
-            }
-        } else if (patternType === 2) {
-            // Bantu Diamond Lattice
-            for (let i = 0; i < Math.min(lineCount, 4); i++) {
-                lines.push({
-                    pts: [{x: 80, y: 80 + i * 40}, {x: 150, y: 120 + i * 40}, {x: 220, y: 80 + i * 40}],
-                    done: false
-                });
-            }
-        } else if (patternType === 3) {
-            // Lemonade Side Sweeps
-            for (let i = 0; i < lineCount; i++) {
-                const y = 80 + i * 35;
-                lines.push({
-                    pts: [{x: 60, y: y}, {x: 170, y: y + 20}, {x: 240, y: y + 50}],
-                    done: false
-                });
-            }
-        } else if (patternType === 4) {
-            // Fulani Center & Arcs
-            lines.push({ pts: [{x: 150, y: 65}, {x: 150, y: 255}], done: false }); // Center braid
-            for (let i = 1; i < lineCount; i++) {
-                const offset = i * 28;
-                lines.push({ pts: [{x: 150 - offset, y: 85}, {x: 150 - offset - 15, y: 235}], done: false });
-                lines.push({ pts: [{x: 150 + offset, y: 85}, {x: 150 + offset + 15, y: 235}], done: false });
-            }
-        } else {
-            // Criss-Cross Diagonal Grid
-            for (let i = 0; i < 3; i++) {
-                lines.push({ pts: [{x: 70 + i * 40, y: 75}, {x: 230 - i * 40, y: 245}], done: false });
-            }
-        }
-
-        return { name, tool, lines };
-    }
 
     function selectTool(tool) {
         initAudio();
@@ -443,17 +568,113 @@
         initAudio();
         triggerHaptic('medium');
         document.getElementById('mainMenu').style.display = 'none';
-        score = 0;
+        score = 25000;
+        bankDebt = 0;
         customerIndex = 0;
+        currentDay = 1;
+        dayTimeLeft = 120;
+        activeMultiplier = 1.0;
+        eventQueueIndex = 0;
+        shuffleArray(masterEvents);
+        shuffleArray(masterHairstyleSequence);
+        customersUntilNextEvent = 1 + Math.floor(Math.random() * 3);
+        updateHUDDay();
+        updateScoreDisplay();
+        startDayTimer();
         loadCustomer();
+    }
+
+    function startDayTimer() {
+        if (dayTimerInterval) clearInterval(dayTimerInterval);
+        dayTimerInterval = setInterval(() => {
+            if (isPaused) return;
+            dayTimeLeft--;
+            const mins = Math.floor(dayTimeLeft / 60).toString().padStart(2, '0');
+            const secs = (dayTimeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('hud-timer').innerText = `${mins}:${secs}`;
+
+            if (dayTimeLeft <= 0) {
+                endDayRoutine();
+            }
+        }, 1000);
+    }
+
+    function endDayRoutine() {
+        isPaused = true;
+        const rentAmount = 15000;
+        score -= rentAmount;
+        
+        let summaryHtml = `
+            <div class="flex justify-between"><span>Completed Day:</span> <span class="font-bold text-amber-300">Day ${currentDay}</span></div>
+            <div class="flex justify-between"><span>Daily Rent & Overhead:</span> <span class="font-bold text-red-400">-${rentAmount.toLocaleString()} FCFA</span></div>
+            <div class="flex justify-between border-t border-amber-800/60 pt-2"><span>New Balance:</span> <span class="font-bold text-green-400">${score.toLocaleString()} FCFA</span></div>
+        `;
+
+        if (score < 0) {
+            summaryHtml += `<div class="text-red-400 font-bold mt-2">Warning: You are in debt! Visit the Bank to take a loan.</div>`;
+        }
+
+        document.getElementById('summary-content').innerHTML = summaryHtml;
+        document.getElementById('daySummaryOverlay').style.display = 'flex';
+        triggerHaptic('heavy');
+    }
+
+    function closeDaySummary() {
+        document.getElementById('daySummaryOverlay').style.display = 'none';
+        currentDay++;
+        dayTimeLeft = 120;
+        updateHUDDay();
+        updateScoreDisplay();
+        isPaused = false;
+    }
+
+    function openBankModal() {
+        initAudio();
+        isPaused = true;
+        document.getElementById('bank-cash').innerText = `${score.toLocaleString()} FCFA`;
+        document.getElementById('bank-debt').innerText = `${bankDebt.toLocaleString()} FCFA`;
+        document.getElementById('bankOverlay').style.display = 'flex';
+    }
+
+    function closeBankModal() {
+        document.getElementById('bankOverlay').style.display = 'none';
+        isPaused = false;
+        updateScoreDisplay();
+    }
+
+    function takeLoan(amount) {
+        score += amount;
+        bankDebt += amount;
+        triggerHaptic('medium');
+        document.getElementById('bank-cash').innerText = `${score.toLocaleString()} FCFA`;
+        document.getElementById('bank-debt').innerText = `${bankDebt.toLocaleString()} FCFA`;
+        updateScoreDisplay();
+    }
+
+    function repayLoan(amount) {
+        if (score >= amount && bankDebt >= amount) {
+            score -= amount;
+            bankDebt -= amount;
+            triggerHaptic('medium');
+            document.getElementById('bank-cash').innerText = `${score.toLocaleString()} FCFA`;
+            document.getElementById('bank-debt').innerText = `${bankDebt.toLocaleString()} FCFA`;
+            updateScoreDisplay();
+        } else {
+            showToast("Not enough funds to repay!");
+        }
     }
 
     function loadCustomer() {
         completedLinesCount = 0;
-        totalAccuracyErrors = 0;
-        totalSamples = 0;
-        currentHairstyle = generateProceduralPattern(customerIndex);
-        startTime = Date.now();
+        activeMultiplier = 1.0;
+        const patternIndex = customerIndex % masterHairstyleSequence.length;
+        const template = masterHairstyleSequence[patternIndex];
+        currentHairstyle = {
+            name: template.name,
+            tool: template.tool,
+            lines: template.lines.map(l => ({ pts: l.pts.map(p => ({...p})), done: false }))
+        };
+
         updateToolBanner();
         renderQueue();
         resizeCanvas();
@@ -462,10 +683,11 @@
     function renderQueue() {
         const q = document.getElementById('queue-list');
         q.innerHTML = '';
-        for (let i = customerIndex; i < customerIndex + 5; i++) {
-            const style = generateProceduralPattern(i);
+        for (let i = 0; i < 5; i++) {
+            const actualIdx = (customerIndex + i) % masterHairstyleSequence.length;
+            const style = masterHairstyleSequence[actualIdx];
             const card = document.createElement('div');
-            const isActive = (i === customerIndex);
+            const isActive = (i === 0);
             card.className = `w-full p-2 rounded-xl border flex flex-col items-center gap-1 transition-all ${
                 isActive 
                 ? 'bg-amber-900/80 border-amber-400 text-amber-100 shadow-md scale-105' 
@@ -479,7 +701,6 @@
         }
     }
 
-    // DRAWING & SCENE RENDERING
     function drawScene() {
         const targetW = 300;
         const targetH = 345;
@@ -489,22 +710,18 @@
         ctx.save();
         ctx.scale(scale, scale);
 
-        // Shoulders & Nape (Perspective from Behind - NO Nose or Face)
-        ctx.fillStyle = '#6b3a19'; // Rich dark skin tone
+        ctx.fillStyle = '#6b3a19';
         ctx.beginPath();
         ctx.ellipse(150, 335, 115, 45, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Neck
         ctx.fillStyle = '#7c441e';
         ctx.fillRect(125, 230, 50, 75);
 
-        // Ears (Rear view)
         ctx.fillStyle = '#6b3a19';
         ctx.beginPath(); ctx.arc(58, 175, 13, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(242, 175, 13, 0, Math.PI * 2); ctx.fill();
 
-        // Head Base
         ctx.fillStyle = '#7c441e';
         ctx.beginPath();
         ctx.ellipse(150, 160, 92, 108, 0, 0, Math.PI * 2);
@@ -513,31 +730,16 @@
         ctx.strokeStyle = '#42210b';
         ctx.stroke();
 
-        // Natural Unbraided Afro Texture
         ctx.fillStyle = '#140b05';
         ctx.beginPath();
         ctx.ellipse(150, 155, 98, 104, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Curl details for natural hair volume
-        ctx.fillStyle = '#26150a';
-        for (let x = 60; x <= 240; x += 15) {
-            for (let y = 60; y <= 240; y += 15) {
-                if (Math.hypot(x - 150, y - 155) < 92) {
-                    ctx.beginPath();
-                    ctx.arc(x + (x % 4), y + (y % 3), 5.5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-        }
-
-        // Draw Pattern Lines
         if (currentHairstyle) {
             currentHairstyle.lines.forEach((line) => {
                 if (line.done) {
                     drawBraidedCornrow(line.pts);
                 } else {
-                    // Guide Line
                     ctx.beginPath();
                     ctx.setLineDash([7, 5]);
                     ctx.moveTo(line.pts[0].x, line.pts[0].y);
@@ -548,16 +750,10 @@
                     ctx.strokeStyle = '#f59e0b';
                     ctx.stroke();
                     ctx.setLineDash([]);
-
-                    // Start/End Guide Dots
-                    ctx.fillStyle = '#fbbf24';
-                    ctx.beginPath(); ctx.arc(line.pts[0].x, line.pts[0].y, 4.5, 0, Math.PI * 2); ctx.fill();
-                    ctx.beginPath(); ctx.arc(line.pts[line.pts.length - 1].x, line.pts[line.pts.length - 1].y, 4.5, 0, Math.PI * 2); ctx.fill();
                 }
             });
         }
 
-        // Active Player Gesture Trace
         if (tracePoints.length > 1) {
             ctx.beginPath();
             ctx.moveTo(tracePoints[0].x, tracePoints[0].y);
@@ -573,7 +769,6 @@
     }
 
     function drawBraidedCornrow(pts) {
-        // Renders detailed braided texture over completed guide lines
         const totalDist = getPathLength(pts);
         const steps = Math.max(12, Math.floor(totalDist / 8));
 
@@ -581,27 +776,14 @@
             const t = i / steps;
             const pt = getPointOnPath(pts, t);
 
-            // Scalp parting line behind braid
             ctx.fillStyle = '#5c3214';
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, 6.5, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, 6.5, 0, Math.PI * 2); ctx.fill();
 
-            // Platted hair overlapping segments
             ctx.fillStyle = (i % 2 === 0) ? '#3b200c' : '#1f1005';
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Highlight shine
-            ctx.fillStyle = 'rgba(251, 191, 36, 0.25)';
-            ctx.beginPath();
-            ctx.arc(pt.x - 1.5, pt.y - 1.5, 2, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2); ctx.fill();
         }
     }
 
-    // Geometry Helpers for Paths & Curves
     function getPathLength(pts) {
         let len = 0;
         for (let i = 0; i < pts.length - 1; i++) {
@@ -616,27 +798,27 @@
                 x: pts[0].x + (pts[1].x - pts[0].x) * t,
                 y: pts[0].y + (pts[1].y - pts[0].y) * t
             };
+        } else if (pts.length === 3) {
+            const oneMinusT = 1 - t;
+            return {
+                x: oneMinusT * oneMinusT * pts[0].x + 2 * oneMinusT * t * pts[1].x + t * t * pts[2].x,
+                y: oneMinusT * oneMinusT * pts[0].y + 2 * oneMinusT * t * pts[1].y + t * t * pts[2].y
+            };
+        } else {
+            return {
+                x: pts[0].x + (pts[pts.length - 1].x - pts[0].x) * t,
+                y: pts[0].y + (pts[pts.length - 1].y - pts[0].y) * t
+            };
         }
-        // Quadratic Interpolation
-        const oneMinusT = 1 - t;
-        return {
-            x: oneMinusT * oneMinusT * pts[0].x + 2 * oneMinusT * t * pts[1].x + t * t * pts[2].x,
-            y: oneMinusT * oneMinusT * pts[0].y + 2 * oneMinusT * t * pts[1].y + t * t * pts[2].y
-        };
     }
 
     function getScaledCanvasPos(e) {
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        
-        const normX = (clientX - rect.left) / rect.width;
-        const normY = (clientY - rect.top) / rect.height;
-
-        return { x: normX * 300, y: normY * 345 };
+        return { x: ((clientX - rect.left) / rect.width) * 300, y: ((clientY - rect.top) / rect.height) * 345 };
     }
 
-    // Touch Event Handlers
     canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handlePointerStart(getScaledCanvasPos(e)); }, {passive: false});
     canvas.addEventListener('touchmove', (e) => { e.preventDefault(); handlePointerMove(getScaledCanvasPos(e)); }, {passive: false});
     canvas.addEventListener('touchend', (e) => { e.preventDefault(); handlePointerEnd(); }, {passive: false});
@@ -648,12 +830,10 @@
     function handlePointerStart(pos) {
         if (!currentHairstyle || isPaused) return;
         initAudio();
-
         if (currentTool !== currentHairstyle.tool) {
             triggerHaptic('heavy');
             return;
         }
-
         isDrawing = true;
         tracePoints = [pos];
     }
@@ -665,40 +845,32 @@
         playStrokeSound();
         drawScene();
 
-        // Check distance to remaining line segments
+        const tolerance = difficultySettings[difficulty].tolerance;
+
         for (let i = 0; i < currentHairstyle.lines.length; i++) {
             const line = currentHairstyle.lines[i];
             if (!line.done && tracePoints.length > 0) {
                 const startPt = line.pts[0];
                 const endPt = line.pts[line.pts.length - 1];
+                const firstTrace = tracePoints[0];
+                if (!firstTrace) continue;
 
-                const dStart = Math.hypot(tracePoints[0].x - startPt.x, tracePoints[0].y - startPt.y);
+                const dStart = Math.hypot(firstTrace.x - startPt.x, firstTrace.y - startPt.y);
                 const dEnd = Math.hypot(pos.x - endPt.x, pos.y - endPt.y);
-
-                const dStartRev = Math.hypot(tracePoints[0].x - endPt.x, tracePoints[0].y - endPt.y);
+                const dStartRev = Math.hypot(firstTrace.x - endPt.x, firstTrace.y - endPt.y);
                 const dEndRev = Math.hypot(pos.x - startPt.x, pos.y - startPt.y);
 
-                // Check distance accuracy along stroke
-                const midPt = getPointOnPath(line.pts, 0.5);
-                const strokeMid = tracePoints[Math.floor(tracePoints.length / 2)] || pos;
-                const strokeErr = Math.hypot(strokeMid.x - midPt.x, strokeMid.y - midPt.y);
-                
-                totalAccuracyErrors += strokeErr;
-                totalSamples++;
-
-                // Line completed if traced from start to end within tolerance
-                if ((dStart < 30 && dEnd < 30) || (dStartRev < 30 && dEndRev < 30)) {
+                if ((dStart < tolerance && dEnd < tolerance) || (dStartRev < tolerance && dEndRev < tolerance)) {
                     line.done = true;
                     completedLinesCount++;
                     triggerHaptic('medium');
                     
-                    score += 350;
-                    document.getElementById('hud-score').innerText = `${score.toLocaleString()} FCFA`;
+                    score += 400;
+                    updateScoreDisplay();
                     
                     tracePoints = [];
                     drawScene();
 
-                    // Check full hairstyle completion
                     if (completedLinesCount >= currentHairstyle.lines.length) {
                         isDrawing = false;
                         evaluateHairstylePerformance();
@@ -715,45 +887,73 @@
         drawScene();
     }
 
-    // Realistic Performance & Time Rating System
+    function triggerLiveDilemma() {
+        isPaused = true;
+        const dilemma = getNextCategorizedEvent();
+        
+        document.getElementById('live-event-icon').innerText = dilemma.icon;
+        document.getElementById('live-event-title').innerText = dilemma.title;
+        document.getElementById('live-event-desc').innerText = dilemma.desc;
+
+        const choicesContainer = document.getElementById('live-event-choices');
+        choicesContainer.innerHTML = '';
+
+        const choices = [
+            { text: dilemma.c1, action: dilemma.c1Act },
+            { text: dilemma.c2, action: dilemma.c2Act }
+        ];
+
+        choices.forEach((choice, index) => {
+            const btn = document.createElement('button');
+            btn.className = `w-full bg-gradient-to-r ${index === 0 ? 'from-amber-600 to-amber-700' : 'from-amber-800 to-amber-900'} text-amber-100 font-semibold py-3 px-4 rounded-xl shadow border border-amber-500/40 text-xs sm:text-sm text-left`;
+            btn.innerHTML = `<span>▶</span> ${choice.text}`;
+            btn.onclick = () => {
+                triggerHaptic('medium');
+                choice.action();
+                document.getElementById('liveEventOverlay').style.display = 'none';
+                isPaused = false;
+            };
+            choicesContainer.appendChild(btn);
+        });
+
+        document.getElementById('liveEventOverlay').style.display = 'flex';
+        triggerHaptic('heavy');
+    }
+
+    function showToast(msg) {
+        const toast = document.createElement('div');
+        toast.className = 'absolute top-16 left-1/2 transform -translate-x-1/2 z-50 bg-amber-500 text-amber-950 font-bold px-4 py-2 rounded-xl shadow-xl text-xs';
+        toast.innerText = msg;
+        document.getElementById('app').appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    }
+
     function evaluateHairstylePerformance() {
-        const elapsedTime = (Date.now() - startTime) / 1000;
-        const avgError = totalSamples > 0 ? (totalAccuracyErrors / totalSamples) : 20;
-
-        let stars = "⭐⭐⭐";
-        let ratingText = "Magnifique! High Precision";
-        let bonus = 1500;
-
-        // Dynamic thresholds based on difficulty
-        if (elapsedTime > 22 || avgError > 32) {
-            stars = "⭐";
-            ratingText = "Needs practice...";
-            bonus = 500;
-            score += 200;
-        } else if (elapsedTime > 12 || avgError > 18) {
-            stars = "⭐⭐";
-            ratingText = "Good Work!";
-            bonus = 1000;
-            score += 500;
-        } else {
-            score += 1000;
-        }
-
-        document.getElementById('celeb-stars').innerText = stars;
-        document.getElementById('celeb-text').innerText = `Time: ${Math.round(elapsedTime)}s • Precision: ${Math.max(40, Math.round(100 - avgError))}%`;
+        const bonus = Math.floor(1500 * activeMultiplier);
+        score += bonus;
         document.getElementById('celeb-money').innerText = `+${bonus.toLocaleString()} FCFA`;
-        document.getElementById('hud-score').innerText = `${score.toLocaleString()} FCFA`;
+        updateScoreDisplay();
         
         document.getElementById('celebrationOverlay').style.display = 'flex';
         triggerHaptic('heavy');
         playFanfareSound();
     }
 
-    function nextCustomer() {
+    function triggerNextCustomer() {
         triggerHaptic('light');
         document.getElementById('celebrationOverlay').style.display = 'none';
         customerIndex++;
-        loadCustomer();
+        
+        customersUntilNextEvent--;
+        if (customersUntilNextEvent <= 0) {
+            customersUntilNextEvent = 1 + Math.floor(Math.random() * 3);
+            loadCustomer();
+            setTimeout(() => {
+                triggerLiveDilemma();
+            }, 300);
+        } else {
+            loadCustomer();
+        }
     }
 
     function togglePause() {
@@ -770,11 +970,12 @@
     function exitToMenu() {
         document.getElementById('pauseOverlay').style.display = 'none';
         document.getElementById('celebrationOverlay').style.display = 'none';
+        document.getElementById('liveEventOverlay').style.display = 'none';
         document.getElementById('mainMenu').style.display = 'flex';
     }
 
-    // Initialize UI language on boot
-    changeLanguage('en');
+    changeLanguage('de');
+    changeDifficulty('medium');
 </script>
 </body>
 </html>
