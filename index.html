@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daysies Hair – Kamerunischer Salon</title>
+    <style>
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; }
+        body { margin: 0; padding: 0; background: #1a0f07; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+        
+        #app {
+            width: 100vw; max-width: 460px; height: 100vh; max-height: 850px;
+            background: #2b180d; border: 4px solid #f59e0b; border-radius: 16px;
+            display: flex; flex-direction: column; position: relative; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+        }
+
+        /* HUD Header */
+        header {
+            background: #d97706; padding: 10px 14px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 3px solid #78350f; font-weight: bold; font-size: 0.9rem;
+        }
+        .hud-badge { background: #78350f; padding: 4px 10px; border-radius: 12px; border: 1px solid #fbbf24; }
+        .btn-pause { background: #b45309; border: 2px solid #fff; border-radius: 8px; color: #fff; font-weight: bold; padding: 4px 10px; cursor: pointer; }
+
+        /* Workspace Layout */
+        .workspace { flex: 1; display: flex; position: relative; background: #3d2314; overflow: hidden; }
+
+        /* Left Customer Queue */
+        .queue-sidebar {
+            width: 110px; background: #26150b; border-right: 3px dashed #b45309; padding: 8px 4px;
+            display: flex; flex-direction: column; align-items: center; gap: 10px; overflow-y: auto;
+        }
+        .queue-title { font-size: 0.65rem; color: #f59e0b; text-transform: uppercase; font-weight: bold; text-align: center; }
+        .queue-card {
+            background: #3d2314; border: 2px solid #f59e0b; border-radius: 10px; padding: 6px; width: 94%;
+            display: flex; flex-direction: column; align-items: center; text-align: center; font-size: 0.7rem;
+        }
+        .queue-card.active { border-color: #4ade80; background: #4a2b18; box-shadow: 0 0 8px rgba(74,222,128,0.5); }
+
+        /* Station Area */
+        .station { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 6px; }
+
+        .tool-banner {
+            width: 95%; background: #b45309; padding: 6px; text-align: center; font-size: 0.78rem;
+            font-weight: bold; color: #fef3c7; border-radius: 8px; margin-bottom: 6px; border: 1px solid #fbbf24;
+        }
+
+        .canvas-container { position: relative; width: 310px; height: 350px; }
+        canvas { background: #1a0f07; border-radius: 16px; border: 3px solid #78350f; touch-action: none; width: 100%; height: 100%; }
+
+        /* Tools Footer */
+        .tool-tray {
+            background: #1a0f07; padding: 8px; display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 6px; border-top: 3px solid #78350f;
+        }
+        .tool-btn {
+            background: #3d2314; border: 2px solid #78350f; border-radius: 10px; padding: 6px 2px;
+            color: #fef3c7; font-size: 0.7rem; font-weight: bold; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+        }
+        .tool-btn.active { background: #f59e0b; color: #78350f; border-color: #fff; transform: scale(1.03); }
+        .tool-btn .icon { font-size: 1.2rem; }
+
+        /* Overlays */
+        .overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(26,15,7,0.96);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; text-align: center; z-index: 20;
+        }
+        .overlay h1 { color: #f59e0b; font-size: 1.8rem; margin-bottom: 5px; text-shadow: 2px 2px 0 #000; }
+        .overlay h2 { color: #fbbf24; margin-bottom: 10px; }
+        
+        .menu-group { width: 85%; margin: 8px 0; text-align: left; }
+        .menu-group label { display: block; font-size: 0.8rem; color: #fef3c7; margin-bottom: 3px; font-weight: bold; }
+        select { width: 100%; padding: 8px; border-radius: 8px; background: #3d2314; color: #fff; border: 2px solid #f59e0b; font-weight: bold; }
+
+        .stars { font-size: 2.3rem; margin: 8px 0; letter-spacing: 4px; }
+        .btn-action {
+            width: 85%; background: #f59e0b; color: #78350f; border: none; padding: 12px;
+            font-weight: bold; font-size: 1rem; border-radius: 12px; cursor: pointer; margin-top: 10px;
+            box-shadow: 0 4px 0 #b45309;
+        }
+        .btn-secondary { background: #78350f; color: #fff; box-shadow: 0 4px 0 #3d2314; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <header>
+        <div>💈 Daysies Hair</div>
+        <div class="hud-badge" id="hud-score">0 FCFA</div>
+        <button class="btn-pause" onclick="togglePause()">⏸️</button>
+    </header>
+
+    <div class="workspace">
+        <div class="queue-sidebar">
+            <div class="queue-title" id="txt-queue">Warteschlange</div>
+            <div id="queue-list" style="width: 100%;"></div>
+        </div>
+
+        <div class="station">
+            <div class="tool-banner">
+                <span id="txt-req-label">Benötigt:</span> <span id="required-tool-display">🪡 Flechtnadel</span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="hairCanvas" width="310" height="350"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-tray">
+        <button class="tool-btn" id="btn-comb" onclick="selectTool('comb')">
+            <span class="icon">📏</span><span id="lbl-comb">Kamm</span>
+        </button>
+        <button class="tool-btn active" id="btn-needle" onclick="selectTool('needle')">
+            <span class="icon">🪡</span><span id="lbl-needle">Nadel</span>
+        </button>
+        <button class="tool-btn" id="btn-oil" onclick="selectTool('oil')">
+            <span class="icon">✨</span><span id="lbl-oil">Glanzöl</span>
+        </button>
+        <button class="tool-btn" id="btn-beads" onclick="selectTool('beads')">
+            <span class="icon">🐚</span><span id="lbl-beads">Perlen</span>
+        </button>
+    </div>
+
+    <!-- Hauptmenü Overlay -->
+    <div class="overlay" id="mainMenu">
+        <h1>💈 Daysies Hair</h1>
+        <p style="font-size: 0.85rem; color: #fef3c7; margin-bottom: 15px;">Salon Douala • Infinite Procedural Braids</p>
+
+        <div class="menu-group">
+            <label id="lbl-lang">Sprache / Language / Langue:</label>
+            <select id="select-lang" onchange="changeLanguage(this.value)">
+                <option value="de">Deutsch</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+            </select>
+        </div>
+
+        <div class="menu-group">
+            <label id="lbl-diff">Schwierigkeitsgrad:</label>
+            <select id="select-diff">
+                <option value="easy">Leicht / Easy / Facile</option>
+                <option value="medium" selected>Normal / Medium / Moyen</option>
+                <option value="hard">Meister / Master / Expert</option>
+            </select>
+        </div>
+
+        <button class="btn-action" id="btn-start" onclick="startGame()">Spiel Starten ➔</button>
+    </div>
+
+    <!-- Pause Overlay -->
+    <div class="overlay" id="pauseOverlay" style="display: none;">
+        <h2 id="txt-paused">Spiel Pausiert</h2>
+        <button class="btn-action" id="btn-resume" onclick="togglePause()">Weiterspielen ➔</button>
+        <button class="btn-action btn-secondary" id="btn-restart" onclick="restartGame()">Neustart 🔄</button>
+        <button class="btn-action btn-secondary" id="btn-exit" onclick="exitToMenu()">Hauptmenü 🏠</button>
+    </div>
+
+    <!-- Ergebnis Overlay -->
+    <div class="overlay" id="celebrationOverlay" style="display: none;">
+        <h2 id="txt-celeb-title">✨ FERTIG! ✨</h2>
+        <div class="stars" id="celeb-stars">⭐⭐⭐</div>
+        <p id="celeb-text" style="color: #fef3c7; font-size: 0.9rem;">Zeit: 12s • Präzision: Gut</p>
+        <div style="background: #3d2314; border: 2px solid #f59e0b; padding: 10px 20px; border-radius: 12px; margin: 10px 0; font-weight: bold;">
+            <span id="lbl-earnings">Verdienst:</span> <span id="celeb-money" style="color: #4ade80;">+1.500 FCFA</span>
+        </div>
+        <button class="btn-action" id="btn-next-cust" onclick="nextCustomer()">Nächste Kundin ➔</button>
+    </div>
+</div>
+
+<script>
+    const i18n = {
+        de: {
+            queue: "Warteschlange", req: "Benötigt:", comb: "Kamm", needle: "Nadel", oil: "Glanzöl", beads: "Perlen",
+            lang: "Sprache:", diff: "Schwierigkeitsgrad:", start: "Spiel Starten ➔", paused: "Spiel Pausiert",
+            resume: "Weiterspielen ➔", restart: "Neustart 🔄", exit: "Hauptmenü 🏠", nextCust: "Nächste Kundin ➔",
+            celebTitle: "✨ BEWERTUNG ✨", earnings: "Verdienst:",
+            tools: { comb: "Abteilkamm", needle: "Flechtnadel", oil: "Glanzöl", beads: "Perlen & Muscheln" }
+        },
+        en: {
+            queue: "Queue", req: "Required:", comb: "Comb", needle: "Needle", oil: "Shine Oil", beads: "Beads",
+            lang: "Language:", diff: "Difficulty:", start: "Start Game ➔", paused: "Game Paused",
+            resume: "Resume ➔", restart: "Restart 🔄", exit: "Main Menu 🏠", nextCust: "Next Customer ➔",
+            celebTitle: "✨ RATING ✨", earnings: "Earnings:",
+            tools: { comb: "Parting Comb", needle: "Braiding Needle", oil: "Edge Oil", beads: "Beads & Shells" }
+        },
+        fr: {
+            queue: "File d'attente", req: "Requis:", comb: "Peigne", needle: "Aiguille", oil: "Huile", beads: "Perles",
+            lang: "Langue:", diff: "Difficulté:", start: "Commencer ➔", paused: "Jeu en Pause",
+            resume: "Continuer ➔", restart: "Recommencer 🔄", exit: "Menu Principal 🏠", nextCust: "Client Suivant ➔",
+            celebTitle: "✨ ÉVALUATION ✨", earnings: "Gains:",
+            tools: { comb: "Peigne à Séparer", needle: "Aiguille à Tresser", oil: "Huile Brillance", beads: "Perles & Coquillages" }
+        }
+    };
+
+    let lang = "de";
+    let score = 0;
+    let customerIndex = 0;
+    let completedLinesCount = 0;
+    let isDrawing = false;
+    let isPaused = false;
+    let tracePoints = [];
+    let currentHairstyle = null;
+    let startTime = 0;
+
+    const toolKeys = ['needle', 'comb', 'oil', 'beads'];
+    const styleNames = ['Fulani Royal', 'Bantu Diamond', 'Douala Wave', 'Yaoundé Grid', 'Kribi Crown', 'Goddess Sweep', 'Tribal Lattice', 'Lemonade Twist'];
+
+    function changeLanguage(newLang) {
+        lang = newLang;
+        const t = i18n[lang];
+        document.getElementById('txt-queue').innerText = t.queue;
+        document.getElementById('txt-req-label').innerText = t.req;
+        document.getElementById('lbl-comb').innerText = t.comb;
+        document.getElementById('lbl-needle').innerText = t.needle;
+        document.getElementById('lbl-oil').innerText = t.oil;
+        document.getElementById('lbl-beads').innerText = t.beads;
+        document.getElementById('lbl-lang').innerText = t.lang;
+        document.getElementById('lbl-diff').innerText = t.diff;
+        document.getElementById('btn-start').innerText = t.start;
+        document.getElementById('txt-paused').innerText = t.paused;
+        document.getElementById('btn-resume').innerText = t.resume;
+        document.getElementById('btn-restart').innerText = t.restart;
+        document.getElementById('btn-exit').innerText = t.exit;
+        document.getElementById('btn-next-cust').innerText = t.nextCust;
+        document.getElementById('txt-celeb-title').innerText = t.celebTitle;
+        document.getElementById('lbl-earnings').innerText = t.earnings;
+        updateToolBanner();
+    }
+
+    // VOLLSTÄNDIG PROZEDURALER GENERATOR FÜR UNENDLICHE MUSTER
+    function generateProceduralAfricanHairstyle(seedIndex) {
+        // Pseudozufall basierend auf seedIndex für Konsistenz in der Warteschlange
+        const pseudoRand = (offset) => Math.sin(seedIndex * 12.9898 + offset * 78.233) * 43758.5453 % 1;
+        const tool = toolKeys[Math.floor(Math.abs(pseudoRand(1)) * toolKeys.length)];
+        const name = `${styleNames[Math.floor(Math.abs(pseudoRand(2)) * styleNames.length)]} #${seedIndex + 1}`;
+        
+        const patternCategory = Math.floor(Math.abs(pseudoRand(3)) * 6);
+        const lineCount = 3 + Math.floor(Math.abs(pseudoRand(4)) * 4); // 3 bis 6 Linien
+        const lines = [];
+
+        if (patternCategory === 0) {
+            // 1. Zick-Zack S-Muster
+            const zigWidth = 30 + pseudoRand(5) * 20;
+            for (let i = 0; i < lineCount; i++) {
+                const y = 85 + i * (170 / lineCount);
+                const dir = (i % 2 === 0) ? 1 : -1;
+                lines.push({ x1: 155 - zigWidth * dir, y1: y, x2: 155 + zigWidth * dir, y2: y + 30, done: false });
+            }
+        } else if (patternCategory === 1) {
+            // 2. Strahlenkranz / Sunburst Crown von einem dynamischen Fokuspunkt
+            const focusX = 155 + (pseudoRand(6) - 0.5) * 40;
+            const focusY = 160 + (pseudoRand(7) - 0.5) * 40;
+            for (let i = 0; i < lineCount; i++) {
+                const angle = (Math.PI * 2 / lineCount) * i;
+                lines.push({
+                    x1: focusX, y1: focusY,
+                    x2: focusX + Math.cos(angle) * 80,
+                    y2: focusY + Math.sin(angle) * 80,
+                    done: false
+                });
+            }
+        } else if (patternCategory === 2) {
+            // 3. Geometrisches Diamond Grid (Gitter)
+            const gridSpacing = 35 + pseudoRand(8) * 15;
+            for (let i = 0; i < Math.floor(lineCount / 2); i++) {
+                lines.push({ x1: 75, y1: 90 + i * gridSpacing, x2: 235, y2: 90 + i * gridSpacing, done: false });
+                lines.push({ x1: 85 + i * gridSpacing, y1: 80, x2: 85 + i * gridSpacing, y2: 250, done: false });
+            }
+        } else if (patternCategory === 3) {
+            // 4. Asymmetrische Lemonade Curves
+            const bend = 30 + pseudoRand(9) * 30;
+            for (let i = 0; i < lineCount; i++) {
+                const startX = 75 + i * (140 / lineCount);
+                lines.push({ x1: startX, y1: 80, x2: startX + bend, y2: 260, done: false });
+            }
+        } else if (patternCategory === 4) {
+            // 5. Tribal Criss-Cross X-Muster
+            for (let i = 0; i < lineCount; i++) {
+                const spread = (i - lineCount / 2) * 25;
+                lines.push({ x1: 80 + spread, y1: 85, x2: 230 - spread, y2: 255, done: false });
+            }
+        } else {
+            // 6. Parallele Cornrows mit variablen Neigungswinkeln
+            const angleShift = (pseudoRand(10) - 0.5) * 50;
+            for (let i = 0; i < lineCount; i++) {
+                const x = 75 + i * (150 / (lineCount - 1));
+                lines.push({ x1: x, y1: 85, x2: x + angleShift, y2: 255, done: false });
+            }
+        }
+
+        return { name, tool, lines };
+    }
+
+    const canvas = document.getElementById('hairCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function selectTool(tool) {
+        currentTool = tool;
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${tool}`).classList.add('active');
+    }
+
+    function updateToolBanner() {
+        if (!currentHairstyle) return;
+        const req = currentHairstyle.tool;
+        const name = i18n[lang].tools[req];
+        const icons = { comb: '📏', needle: '🪡', oil: '✨', beads: '🐚' };
+        document.getElementById('required-tool-display').innerText = `${icons[req]} ${name}`;
+    }
+
+    function startGame() {
+        document.getElementById('mainMenu').style.display = 'none';
+        score = 0;
+        customerIndex = 0;
+        loadCustomer();
+    }
+
+    function loadCustomer() {
+        completedLinesCount = 0;
+        currentHairstyle = generateProceduralAfricanHairstyle(customerIndex);
+        startTime = Date.now();
+        updateToolBanner();
+        renderQueue();
+        drawScene();
+    }
+
+    function renderQueue() {
+        const q = document.getElementById('queue-list');
+        q.innerHTML = '';
+        for (let i = customerIndex; i < customerIndex + 4; i++) {
+            const tempStyle = generateProceduralAfricanHairstyle(i);
+            const card = document.createElement('div');
+            card.className = `queue-card ${i === customerIndex ? 'active' : ''}`;
+            card.innerHTML = `<div>${i === customerIndex ? '👩🏾' : '👤'}</div><div style="font-size:0.6rem;">${tempStyle.name}</div>`;
+            q.appendChild(card);
+        }
+    }
+
+    // RENDERING: Hinterkopf-Perspektive (Nape, Shoulders, Ears)
+    function drawScene() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Nacken & Schultern
+        ctx.fillStyle = '#8c532b';
+        ctx.beginPath(); ctx.ellipse(155, 330, 110, 50, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#9a5b30'; ctx.fillRect(130, 240, 50, 60);
+
+        // Ohren von hinten
+        ctx.fillStyle = '#8c532b';
+        ctx.beginPath(); ctx.arc(60, 180, 12, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(250, 180, 12, 0, Math.PI*2); ctx.fill();
+
+        // Hinterkopf Basis
+        ctx.fillStyle = '#9a5b30';
+        ctx.beginPath(); ctx.ellipse(155, 170, 85, 105, 0, 0, Math.PI*2); ctx.fill();
+        ctx.lineWidth = 3; ctx.strokeStyle = '#523119'; ctx.stroke();
+
+        // UNGEFLOCHTENES NATURHAAR
+        ctx.fillStyle = '#170e08';
+        ctx.beginPath(); ctx.ellipse(155, 165, 92, 98, 0, 0, Math.PI*2); ctx.fill();
+
+        // Locken-Textur
+        ctx.fillStyle = '#2b1a0e';
+        for (let x = 70; x <= 240; x += 16) {
+            for (let y = 70; y <= 240; y += 16) {
+                if (Math.hypot(x - 155, y - 165) < 85) {
+                    ctx.beginPath(); ctx.arc(x + (x % 3), y + (y % 5), 6, 0, Math.PI * 2); ctx.fill();
+                }
+            }
+        }
+
+        // FÜHRUNGSLINIEN vs. GEFLOCHTENE PFADE
+        if (currentHairstyle) {
+            currentHairstyle.lines.forEach((line) => {
+                if (line.done) {
+                    drawBraidPattern(line);
+                } else {
+                    ctx.beginPath();
+                    ctx.setLineDash([8, 6]);
+                    ctx.moveTo(line.x1, line.y1);
+                    ctx.lineTo(line.x2, line.y2);
+                    ctx.lineWidth = 5;
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            });
+        }
+
+        // Aktuell gezogener Pfad
+        if (tracePoints.length > 1) {
+            ctx.beginPath();
+            ctx.moveTo(tracePoints[0].x, tracePoints[0].y);
+            tracePoints.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = '#4ade80';
+            ctx.stroke();
+        }
+    }
+
+    function drawBraidPattern(line) {
+        const dist = Math.hypot(line.x2 - line.x1, line.y2 - line.y1);
+        const steps = Math.floor(dist / 10);
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const x = line.x1 + (line.x2 - line.x1) * t;
+            const y = line.y1 + (line.y2 - line.y1) * t;
+            ctx.fillStyle = (i % 2 === 0) ? '#4a2b18' : '#2b1a0e';
+            ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
+        }
+    }
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    canvas.addEventListener('mousedown', (e) => startTrace(getPos(e)));
+    canvas.addEventListener('mousemove', (e) => trace(getPos(e)));
+    canvas.addEventListener('mouseup', endTrace);
+    canvas.addEventListener('touchstart', (e) => { startTrace(getPos(e)); e.preventDefault(); });
+    canvas.addEventListener('touchmove', (e) => { trace(getPos(e)); e.preventDefault(); });
+    canvas.addEventListener('touchend', endTrace);
+
+    function startTrace(pos) {
+        if (!currentHairstyle) return;
+        const req = currentHairstyle.tool;
+        if (currentTool !== req) return;
+        isDrawing = true;
+        tracePoints = [pos];
+    }
+
+    function trace(pos) {
+        if (!isDrawing || !currentHairstyle) return;
+        tracePoints.push(pos);
+        drawScene();
+
+        currentHairstyle.lines.forEach(line => {
+            if (!line.done) {
+                const dStart = Math.hypot(tracePoints[0].x - line.x1, tracePoints[0].y - line.y1);
+                const dEnd = Math.hypot(pos.x - line.x2, pos.y - line.y2);
+                const dStartRev = Math.hypot(tracePoints[0].x - line.x2, tracePoints[0].y - line.y2);
+                const dEndRev = Math.hypot(pos.x - line.x1, pos.y - line.y1);
+
+                if ((dStart < 35 && dEnd < 35) || (dStartRev < 35 && dEndRev < 35)) {
+                    line.done = true;
+                    completedLinesCount++;
+                    score += 400;
+                    document.getElementById('hud-score').innerText = `${score} FCFA`;
+                    tracePoints = [];
+                    drawScene();
+
+                    if (completedLinesCount >= currentHairstyle.lines.length) {
+                        isDrawing = false;
+                        evaluatePerformance();
+                    }
+                }
+            }
+        });
+    }
+
+    function endTrace() {
+        isDrawing = false;
+        tracePoints = [];
+        drawScene();
+    }
+
+    function evaluatePerformance() {
+        const elapsedTime = (Date.now() - startTime) / 1000;
+        let stars = "⭐⭐⭐";
+        let ratingText = "Hervorragend!";
+        let bonus = 1500;
+
+        if (elapsedTime > 25) {
+            stars = "⭐";
+            ratingText = "Langsam...";
+            bonus = 500;
+            score += 200;
+        } else if (elapsedTime > 14) {
+            stars = "⭐⭐";
+            ratingText = "Gute Arbeit!";
+            bonus = 1000;
+            score += 500;
+        } else {
+            score += 1000;
+        }
+
+        document.getElementById('celeb-stars').innerText = stars;
+        document.getElementById('celeb-text').innerText = `Zeit: ${Math.round(elapsedTime)}s • ${ratingText}`;
+        document.getElementById('celeb-money').innerText = `+${bonus} FCFA`;
+        document.getElementById('celebrationOverlay').style.display = 'flex';
+        playFanfare();
+    }
+
+    function nextCustomer() {
+        document.getElementById('celebrationOverlay').style.display = 'none';
+        customerIndex++;
+        loadCustomer();
+    }
+
+    function playFanfare() {
+        try {
+            const actx = new (window.AudioContext || window.webkitAudioContext)();
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const osc = actx.createOscillator();
+                const gain = actx.createGain();
+                osc.frequency.setValueAtTime(freq, actx.currentTime + idx * 0.1);
+                gain.gain.setValueAtTime(0.08, actx.currentTime + idx * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + idx * 0.1 + 0.25);
+                osc.connect(gain); gain.connect(actx.destination);
+                osc.start(actx.currentTime + idx * 0.1);
+                osc.stop(actx.currentTime + idx * 0.1 + 0.25);
+            });
+        } catch(e) {}
+    }
+
+    function togglePause() {
+        isPaused = !isPaused;
+        document.getElementById('pauseOverlay').style.display = isPaused ? 'flex' : 'none';
+    }
+
+    function restartGame() {
+        document.getElementById('pauseOverlay').style.display = 'none';
+        startGame();
+    }
+
+    function exitToMenu() {
+        document.getElementById('pauseOverlay').style.display = 'none';
+        document.getElementById('celebrationOverlay').style.display = 'none';
+        document.getElementById('mainMenu').style.display = 'flex';
+    }
+
+    changeLanguage('de');
+</script>
+
+</body>
+</html>
